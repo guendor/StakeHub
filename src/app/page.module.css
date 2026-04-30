@@ -1,0 +1,183 @@
+.hero {
+  padding: var(--space-20) 0 var(--space-16);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(124, 92, 252, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.heroInner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--space-16);
+}
+
+@media (max-width: 900px) {
+  .heroInner { grid-template-columns: 1fr; }
+  .heroVisual { display: none; }
+}
+
+.heroContent { display: flex; flex-direction: column; gap: var(--space-5); }
+
+.heroTitle {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  line-height: 1.1;
+  font-weight: 900;
+}
+
+.heroSub {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  max-width: 500px;
+  line-height: 1.7;
+}
+
+.heroCtas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding-top: var(--space-3);
+}
+
+/* Hero card preview */
+.heroVisual {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.heroCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  box-shadow: 0 0 60px rgba(124, 92, 252, 0.12), var(--shadow-lg);
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.heroCardBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: var(--color-success-dim);
+  color: var(--color-success);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: fit-content;
+}
+
+.heroCardTitle {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.heroCardStat {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+}
+.heroCardStat span:first-child { color: var(--text-muted); }
+.heroCardStat strong { color: var(--text-primary); }
+
+.heroCardProgress {
+  background: var(--color-surface-3);
+  border-radius: var(--radius-full);
+  height: 6px;
+  overflow: hidden;
+}
+.heroCardProgress div {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-hover));
+  border-radius: var(--radius-full);
+}
+
+.heroCardPlayer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-3);
+}
+
+/* How section */
+.howSection {
+  padding: var(--space-20) 0;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.stepCard {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.stepIcon {
+  font-size: 2.5rem;
+  width: 72px;
+  height: 72px;
+  background: var(--color-accent-dim);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Featured */
+.featuredSection {
+  padding: var(--space-20) 0;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: var(--space-8);
+}
+
+/* CTA Banner */
+.ctaBanner {
+  padding: var(--space-16) 0;
+  background: linear-gradient(135deg, rgba(124, 92, 252, 0.08), rgba(240, 180, 41, 0.06));
+  border-top: 1px solid var(--color-border);
+}
+
+.ctaInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  flex-wrap: wrap;
+}

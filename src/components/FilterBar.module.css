@@ -1,0 +1,36 @@
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.select {
+  min-width: 160px;
+  flex-shrink: 0;
+}
+
+.rangeGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rangeLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.rangeInput {
+  width: 130px;
+}
+
+.dateInput {
+  min-width: 140px;
+  color-scheme: dark;
+}

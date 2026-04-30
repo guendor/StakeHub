@@ -1,0 +1,90 @@
+.page {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+}
+
+.card {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.logoWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.6rem;
+  letter-spacing: -0.02em;
+}
+.logoIcon {
+  color: var(--color-gold);
+  filter: drop-shadow(0 0 8px rgba(240, 180, 41, 0.5));
+}
+.logoText { color: var(--text-primary); }
+
+.tabs {
+  display: flex;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  gap: 4px;
+}
+
+.tab {
+  flex: 1;
+  padding: var(--space-3);
+  border-radius: calc(var(--radius-md) - 2px);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+.tab:hover { color: var(--text-primary); }
+.tabActive {
+  background: var(--color-surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.form { display: flex; flex-direction: column; gap: var(--space-4); }
+
+/* Role selector */
+.roleSelector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+.roleBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  border: 2px solid var(--color-border);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.roleBtn:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-dim);
+}
+.roleBtnActive {
+  border-color: var(--color-accent);
+  background: var(--color-accent-dim);
+}
+.roleIcon { font-size: 1.4rem; }
+.roleLabel { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); }
+.roleDesc { font-size: 0.72rem; color: var(--text-muted); }
