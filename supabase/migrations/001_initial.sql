@@ -136,7 +136,9 @@ CREATE POLICY "Backers can delete their own interests"
 -- ============================================================
 -- HELPFUL VIEW: listing with computed fields
 -- ============================================================
-CREATE OR REPLACE VIEW listings_computed AS
+CREATE OR REPLACE VIEW listings_computed
+WITH (security_invoker = on)
+AS
 SELECT
   l.*,
   (l.buy_in + l.addon + l.other_fees) AS total_cost,

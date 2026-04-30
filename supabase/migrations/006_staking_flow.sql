@@ -13,7 +13,9 @@ ALTER TABLE listings ADD COLUMN IF NOT EXISTS escrow_balance NUMERIC(12, 2) NOT 
 
 -- 3. Recreate listings_computed to only count accepted quotas
 DROP VIEW IF EXISTS listings_computed;
-CREATE OR REPLACE VIEW listings_computed AS
+CREATE OR REPLACE VIEW listings_computed
+WITH (security_invoker = on)
+AS
 SELECT
   l.*,
   (l.buy_in + l.addon + l.other_fees) AS total_cost,
