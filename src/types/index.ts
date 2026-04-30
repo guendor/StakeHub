@@ -6,6 +6,7 @@ export interface Profile {
   id: string;
   role: UserRole;
   display_name: string;
+  nickname: string | null;
   bio: string | null;
   achievements: string[] | null;
   external_links: ExternalLink[] | null;
@@ -53,6 +54,17 @@ export interface Interest {
   // Joined
   profiles?: Profile;
   listings?: Listing;
+}
+
+export interface Trophy {
+  id: string;
+  player_id: string;
+  photo_url: string;
+  placement: string;
+  tournament_name: string;
+  prize_amount: number | null;
+  tournament_date: string;
+  created_at: string;
 }
 
 export function computeListingValues(listing: Listing): Listing {

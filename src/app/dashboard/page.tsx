@@ -60,13 +60,16 @@ export default async function DashboardPage() {
             </span>
           </p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-wrap">
           {isPlayer && (
             <Link href="/dashboard/new-listing" className="btn btn-gold">
               + Novo anúncio
             </Link>
           )}
-          <Link href={`/players/${user.id}`} className="btn btn-outline">
+          <Link href="/dashboard/profile" className="btn btn-outline">
+            Editar perfil
+          </Link>
+          <Link href={`/players/${user.id}`} className="btn btn-ghost">
             Ver perfil público
           </Link>
         </div>

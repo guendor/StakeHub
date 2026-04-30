@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { computeListingValues, type Listing } from '@/types';
+import { computeListingValues, type Listing, type Trophy } from '@/types';
 import ListingCard from '@/components/ListingCard';
 import type { Metadata } from 'next';
 import styles from './page.module.css';
@@ -38,6 +38,12 @@ export default async function PlayerProfilePage({ params }: Props) {
 
   const listings: Listing[] = (rawListings ?? []).map(computeListingValues);
 
+  const { data: trophies } = await supabase
+    .from('trophies')
+    .select('*')
+    .eq('player_id', id)
+    .order('tournament_date', { ascending: false });
+
   return (
     <div className="container-sm">
       <div style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-16)' }}>
@@ -53,7 +59,10 @@ export default async function PlayerProfilePage({ params }: Props) {
             )}
           </div>
           <div className={styles.profileInfo}>
-            <h1 className={styles.name}>{profile.display_name}</h1>
+            <h1 className={styles.name}>
+              {profile.display_name}
+              {profile.nickname && <span className={styles.nickname}> ({profile.nickname})</span>}
+            </h1>
             <span className={`badge ${profile.role === 'player' ? 'badge-player' : 'badge-backer'}`}>
               {profile.role === 'player' ? '🃏 Jogador' : '💼 Investidor'}
             </span>
@@ -86,6 +95,34 @@ export default async function PlayerProfilePage({ params }: Props) {
             )}
           </div>
         </div>
+
+        {/* Trophy Showcase */}
+        {profile.role === 'player' && trophies && trophies.length > 0 && (
+          <div style={{ marginTop: 'var(--space-8)' }}>
+            <h2 style={{ marginBottom: 'var(--space-6)' }}>🏆 Vitrine de Troféus</h2>
+            <div className={styles.trophyGrid}>
+              {trophies.map((trophy: Trophy) => (
+                <div key={trophy.id} className={`card ${styles.trophyCard}`}>
+                  <div className={styles.trophyImgWrap}>
+                    <img src={trophy.photo_url} alt={trophy.tournament_name} className={styles.trophyImg} />
+                    <span className={styles.trophyPlacement}>{trophy.placement}</span>
+                  </div>
+                  <div className={styles.trophyInfo}>
+                    <h4 className={styles.trophyName}>{trophy.tournament_name}</h4>
+                    <div className={styles.trophyMeta}>
+                      <span>📅 {new Date(trophy.tournament_date).toLocaleDateString('pt-BR', { year: 'numeric', month: 'short', day: '2-digit' })}</span>
+                      {trophy.prize_amount && (
+                        <span style={{ color: 'var(--color-gold)', fontWeight: 700 }}>
+                          {trophy.prize_amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Open listings */}
         <div style={{ marginTop: 'var(--space-8)' }}>
