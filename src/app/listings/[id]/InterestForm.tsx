@@ -30,12 +30,23 @@ export default function InterestForm({ listingId, maxQuotas, pricePerQuota }: Pr
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setError('Sessão expirada. Faça login novamente.'); setLoading(false); return; }
 
+    const { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
+    if (!profile) { setError('Erro ao carregar perfil.'); setLoading(false); return; }
+
+    const totalCost = quotas * pricePerQuota;
+    if (profile.balance < totalCost) {
+      setError(`Saldo insuficiente. Você tem ${formatBRL(profile.balance)} e a proposta custa ${formatBRL(totalCost)}.`);
+      setLoading(false);
+      return;
+    }
+
     const { error: err } = await supabase.from('interests').insert({
       listing_id: listingId,
       backer_id: user.id,
       quotas_wanted: quotas,
       message: message.trim() || null,
       payment_stub: null, // reserved for future payment integration
+      status: 'pending'
     });
 
     if (err) {

@@ -38,6 +38,7 @@ export interface Listing {
   status: ListingStatus;
   notes: string | null;
   created_at: string;
+  escrow_balance: number;
   // Joined
   profiles?: Profile;
   interests?: Interest[];
@@ -55,6 +56,7 @@ export interface Interest {
   quotas_wanted: number;
   message: string | null;
   payment_stub: Record<string, unknown> | null;
+  status: 'pending' | 'accepted' | 'rejected';
   created_at: string;
   // Joined
   profiles?: Profile;
@@ -103,6 +105,6 @@ export function computeListingValues(listing: Listing): Listing {
   const price_per_quota =
     (total_cost * (1 + listing.pct_per_quota / 100)) / listing.total_quotas;
   const quotas_taken =
-    listing.interests?.reduce((acc, i) => acc + i.quotas_wanted, 0) ?? 0;
+    listing.interests?.filter(i => i.status === 'accepted').reduce((acc, i) => acc + i.quotas_wanted, 0) ?? 0;
   return { ...listing, total_cost, price_per_quota, quotas_taken };
 }

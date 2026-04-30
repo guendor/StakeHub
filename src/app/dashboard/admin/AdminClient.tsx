@@ -26,6 +26,8 @@ export default function AdminClient({
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<Profile | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [logSearchTerm, setLogSearchTerm] = useState('');
+  const [balanceDiff, setBalanceDiff] = useState(0);
 
   const supabase = createClient();
 
@@ -38,6 +40,13 @@ export default function AdminClient({
   });
 
   const clubs = filteredProfiles.filter(p => p.role === 'club');
+
+  const filteredLogs = logs.filter(log => {
+    const term = logSearchTerm.toLowerCase();
+    const adminMatch = log.admin?.display_name?.toLowerCase().includes(term);
+    const targetMatch = log.target_user?.display_name?.toLowerCase().includes(term);
+    return adminMatch || targetMatch;
+  });
 
   async function toggleVerification(club: Profile) {
     setLoadingId(club.id);
@@ -72,21 +81,41 @@ export default function AdminClient({
     if (!editingUser) return;
     setLoadingId('saving');
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({ 
-        role: editingUser.role,
-        balance: editingUser.balance
-      })
-      .eq('id', editingUser.id);
-
-    if (error) {
-      alert(`Erro: ${error.message}`);
+    // If we only updated role (or nothing), do standard update
+    if (balanceDiff === 0) {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role: editingUser.role })
+        .eq('id', editingUser.id);
+        
+      if (error) alert(`Erro: ${error.message}`);
     } else {
-      setProfiles(profiles.map(p => p.id === editingUser.id ? editingUser : p));
-      setEditingUser(null);
-      fetchLogs();
+      // If we are adjusting balance, we use the RPC for safety
+      // First update role
+      await supabase.from('profiles').update({ role: editingUser.role }).eq('id', editingUser.id);
+      
+      // Then adjust balance
+      const { error: rpcError } = await supabase.rpc('admin_adjust_balance', {
+        p_target_user_id: editingUser.id,
+        p_amount: balanceDiff
+      });
+
+      if (rpcError) {
+        alert(`Erro ao ajustar saldo: ${rpcError.message}`);
+        setLoadingId(null);
+        return;
+      }
     }
+
+    // Refresh data
+    const { data: refreshedProfile } = await supabase.from('profiles').select('*').eq('id', editingUser.id).single();
+    if (refreshedProfile) {
+      setProfiles(profiles.map(p => p.id === editingUser.id ? refreshedProfile : p));
+    }
+    
+    setEditingUser(null);
+    setBalanceDiff(0);
+    fetchLogs();
     setLoadingId(null);
   }
 
@@ -206,16 +235,53 @@ export default function AdminClient({
                     </select>
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Saldo (R$)</label>
-                    <input 
-                      type="number" 
-                      min={0} 
-                      step={0.01} 
-                      className="form-input" 
-                      value={editingUser.balance} 
-                      onChange={(e) => setEditingUser({...editingUser, balance: parseFloat(e.target.value) || 0})}
-                      required
-                    />
+                    <label className="form-label">Ajuste de Saldo (R$)</label>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                      Saldo atual: <strong style={{ color: 'var(--color-success)' }}>{formatBRL(editingUser.balance)}</strong>
+                      <br/>
+                      Novo saldo projetado: <strong>{formatBRL(editingUser.balance + balanceDiff)}</strong>
+                    </div>
+                    <div className="flex gap-2">
+                      <input 
+                        type="number" 
+                        min={0} 
+                        step={0.01} 
+                        className="form-input" 
+                        placeholder="Quantia..."
+                        id="balance_adj_input"
+                      />
+                      <button 
+                        type="button" 
+                        className="btn btn-outline"
+                        style={{ borderColor: 'var(--color-success)', color: 'var(--color-success)' }}
+                        onClick={() => {
+                          const val = parseFloat((document.getElementById('balance_adj_input') as HTMLInputElement).value) || 0;
+                          setBalanceDiff(balanceDiff + val);
+                          (document.getElementById('balance_adj_input') as HTMLInputElement).value = '';
+                        }}
+                      >
+                        + Add
+                      </button>
+                      <button 
+                        type="button" 
+                        className="btn btn-outline"
+                        style={{ borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }}
+                        onClick={() => {
+                          const val = parseFloat((document.getElementById('balance_adj_input') as HTMLInputElement).value) || 0;
+                          setBalanceDiff(balanceDiff - val);
+                          (document.getElementById('balance_adj_input') as HTMLInputElement).value = '';
+                        }}
+                      >
+                        - Retirar
+                      </button>
+                      <button 
+                        type="button" 
+                        className="btn btn-ghost"
+                        onClick={() => setBalanceDiff(0)}
+                      >
+                        Resetar
+                      </button>
+                    </div>
                   </div>
                   <div className="flex gap-4">
                     <button type="submit" className="btn btn-gold" disabled={loadingId === 'saving'}>
@@ -251,7 +317,13 @@ export default function AdminClient({
                         <td><span className="badge badge-player">{p.role}</span></td>
                         <td style={{ color: 'var(--color-success)', fontWeight: 600 }}>{formatBRL(p.balance)}</td>
                         <td>
-                          <button className="btn btn-sm btn-outline" onClick={() => setEditingUser(p)}>
+                          <button 
+                            className="btn btn-sm btn-outline" 
+                            onClick={() => {
+                              setEditingUser(p);
+                              setBalanceDiff(0);
+                            }}
+                          >
                             ✏️ Editar
                           </button>
                         </td>
@@ -266,11 +338,23 @@ export default function AdminClient({
 
         {tab === 'logs' && (
           <>
-            <h3 style={{ marginBottom: 'var(--space-4)' }}>Histórico de Auditoria</h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 'var(--space-4)' }}>
-              Registros imutáveis de alterações sensíveis.
-            </p>
-            {logs.length === 0 ? (
+            <div className="flex justify-between items-center" style={{ marginBottom: 'var(--space-4)' }}>
+              <div>
+                <h3 style={{ margin: 0 }}>Histórico de Auditoria</h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
+                  Registros imutáveis de alterações sensíveis.
+                </p>
+              </div>
+              <input 
+                type="text" 
+                className="form-input" 
+                placeholder="Buscar por usuário..." 
+                value={logSearchTerm}
+                onChange={e => setLogSearchTerm(e.target.value)}
+                style={{ width: '250px' }}
+              />
+            </div>
+            {filteredLogs.length === 0 ? (
               <div className="empty-state">
                 <p>Nenhum log registrado ainda.</p>
               </div>
@@ -286,7 +370,7 @@ export default function AdminClient({
                     </tr>
                   </thead>
                   <tbody>
-                    {logs.map((log) => (
+                    {filteredLogs.map((log) => (
                       <tr key={log.id}>
                         <td style={{ fontSize: '0.8rem' }}>{formatDate(log.created_at)}</td>
                         <td>{log.admin?.display_name ?? 'Sistema'}</td>

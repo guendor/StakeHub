@@ -5,6 +5,7 @@ import { computeListingValues } from '@/types';
 import StatusBadge from '@/components/StatusBadge';
 import QuotaProgress from '@/components/QuotaProgress';
 import InterestForm from './InterestForm';
+import InterestActionButtons from './InterestActionButtons';
 import type { Metadata } from 'next';
 import styles from './page.module.css';
 
@@ -163,6 +164,7 @@ export default async function ListingDetailPage({ params }: Props) {
                       <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                         {formatBRL((listing.price_per_quota ?? 0) * interest.quotas_wanted)}
                       </p>
+                      <InterestActionButtons interestId={interest.id} currentStatus={interest.status} />
                     </div>
                   </div>
                 ))}
