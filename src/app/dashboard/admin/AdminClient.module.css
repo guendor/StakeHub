@@ -1,3 +1,48 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.tabs {
+  display: flex;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  gap: 4px;
+  max-width: fit-content;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: var(--space-2) var(--space-4);
+  border-radius: calc(var(--radius-md) - 2px);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--text-primary);
+}
+
+.tabActive {
+  background: var(--color-surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.editModal {
+  padding: var(--space-6);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
 .tableWrap {
   overflow-x: auto;
 }

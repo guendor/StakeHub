@@ -4,6 +4,7 @@ export type ListingStatus = 'open' | 'funded' | 'in_progress' | 'settled';
 
 export interface Profile {
   id: string;
+  platform_id: number;
   role: UserRole;
   display_name: string;
   nickname: string | null;
@@ -12,6 +13,7 @@ export interface Profile {
   external_links: ExternalLink[] | null;
   avatar_url: string | null;
   is_verified: boolean;
+  balance: number;
   created_at: string;
 }
 
@@ -81,6 +83,19 @@ export interface ClubTournament {
   created_at: string;
   // Joined
   profiles?: Profile;
+}
+
+export interface AuditLog {
+  id: string;
+  admin_id: string | null;
+  target_user_id: string;
+  action: string;
+  old_data: Record<string, any>;
+  new_data: Record<string, any>;
+  created_at: string;
+  // Joined
+  admin?: Profile;
+  target_user?: Profile;
 }
 
 export function computeListingValues(listing: Listing): Listing {

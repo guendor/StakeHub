@@ -19,11 +19,16 @@ export default async function AdminDashboardPage() {
     redirect('/dashboard');
   }
 
-  // Fetch all clubs
-  const { data: clubs } = await supabase
+  // Fetch all profiles
+  const { data: allProfiles } = await supabase
     .from('profiles')
     .select('*')
-    .eq('role', 'club')
+    .order('created_at', { ascending: false });
+
+  // Fetch audit logs
+  const { data: auditLogs } = await supabase
+    .from('audit_logs')
+    .select('*, admin:profiles!audit_logs_admin_id_fkey(display_name), target_user:profiles!audit_logs_target_user_id_fkey(display_name)')
     .order('created_at', { ascending: false });
 
   return (
@@ -42,7 +47,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div className={styles.content}>
-        <AdminClient initialClubs={clubs ?? []} />
+        <AdminClient initialProfiles={allProfiles ?? []} initialLogs={auditLogs ?? []} />
       </div>
     </div>
   );

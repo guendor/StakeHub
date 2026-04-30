@@ -26,11 +26,10 @@ export default async function DashboardPage() {
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
   if (!profile) redirect('/auth/login');
 
-  const isPlayer = profile.role === 'player';
+  const isPlayer = profile.role === 'player' || profile.role === 'admin';
   const isAdmin = profile.role === 'admin';
 
   if (profile.role === 'club') redirect('/dashboard/club');
-  if (profile.role === 'admin') redirect('/dashboard/admin');
 
   let listings: Listing[] = [];
   let interests: Interest[] = [];
@@ -65,6 +64,11 @@ export default async function DashboardPage() {
           </p>
         </div>
         <div className="flex gap-4 flex-wrap">
+          {isAdmin && (
+            <Link href="/dashboard/admin" className="btn btn-primary" style={{ backgroundColor: 'var(--color-danger)', borderColor: 'var(--color-danger)', color: 'white' }}>
+              ⚙️ Painel Admin
+            </Link>
+          )}
           {isPlayer && (
             <Link href="/dashboard/new-listing" className="btn btn-gold">
               + Novo anúncio
