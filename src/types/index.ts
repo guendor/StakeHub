@@ -1,4 +1,4 @@
-export type UserRole = 'player' | 'backer';
+export type UserRole = 'player' | 'backer' | 'club' | 'admin';
 
 export type ListingStatus = 'open' | 'funded' | 'in_progress' | 'settled';
 
@@ -11,6 +11,7 @@ export interface Profile {
   achievements: string[] | null;
   external_links: ExternalLink[] | null;
   avatar_url: string | null;
+  is_verified: boolean;
   created_at: string;
 }
 
@@ -22,6 +23,7 @@ export interface ExternalLink {
 export interface Listing {
   id: string;
   player_id: string;
+  club_tournament_id: string | null;
   tournament_name: string;
   tournament_date: string;
   venue: string | null;
@@ -37,6 +39,7 @@ export interface Listing {
   // Joined
   profiles?: Profile;
   interests?: Interest[];
+  club_tournaments?: ClubTournament;
   // Computed
   total_cost?: number;
   price_per_quota?: number;
@@ -65,6 +68,19 @@ export interface Trophy {
   prize_amount: number | null;
   tournament_date: string;
   created_at: string;
+}
+
+export interface ClubTournament {
+  id: string;
+  club_id: string;
+  name: string;
+  date: string;
+  buy_in: number;
+  guaranteed_prize: number | null;
+  is_active: boolean;
+  created_at: string;
+  // Joined
+  profiles?: Profile;
 }
 
 export function computeListingValues(listing: Listing): Listing {

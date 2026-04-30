@@ -27,6 +27,10 @@ export default async function DashboardPage() {
   if (!profile) redirect('/auth/login');
 
   const isPlayer = profile.role === 'player';
+  const isAdmin = profile.role === 'admin';
+
+  if (profile.role === 'club') redirect('/dashboard/club');
+  if (profile.role === 'admin') redirect('/dashboard/admin');
 
   let listings: Listing[] = [];
   let interests: Interest[] = [];
@@ -34,7 +38,7 @@ export default async function DashboardPage() {
   if (isPlayer) {
     const { data } = await supabase
       .from('listings')
-      .select('*, interests(id, quotas_wanted, backer_id, message, created_at, profiles(id, display_name, avatar_url))')
+      .select('*, interests(id, quotas_wanted, backer_id, message, created_at, profiles(id, display_name, avatar_url)), club_tournaments(profiles(display_name))')
       .eq('player_id', user.id)
       .order('created_at', { ascending: false });
     listings = (data ?? []).map(computeListingValues);

@@ -23,7 +23,7 @@ async function ListingsGrid({ searchParams }: { searchParams: SearchParams }) {
 
   let query = supabase
     .from('listings')
-    .select('*, profiles(*), interests(id, quotas_wanted)')
+    .select('*, profiles(*), interests(id, quotas_wanted), club_tournaments(profiles(display_name))')
     .order('created_at', { ascending: false });
 
   if (searchParams.status) {

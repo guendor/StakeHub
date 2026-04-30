@@ -31,7 +31,7 @@ export default async function PlayerProfilePage({ params }: Props) {
 
   const { data: rawListings } = await supabase
     .from('listings')
-    .select('*, profiles(*), interests(id, quotas_wanted)')
+    .select('*, profiles(*), interests(id, quotas_wanted), club_tournaments(profiles(display_name))')
     .eq('player_id', id)
     .eq('status', 'open')
     .order('created_at', { ascending: false });

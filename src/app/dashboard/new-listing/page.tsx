@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import type { ClubTournament, Profile } from '@/types';
 import styles from './page.module.css';
 
 function formatBRL(value: number) {
@@ -15,6 +16,9 @@ export default function NewListingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  const [clubTournaments, setClubTournaments] = useState<(ClubTournament & { profiles?: Profile })[]>([]);
+  const [selectedClubTournamentId, setSelectedClubTournamentId] = useState('');
 
   const [form, setForm] = useState({
     tournament_name: '',
@@ -31,6 +35,33 @@ export default function NewListingPage() {
 
   function set(key: string, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  useEffect(() => {
+    async function fetchTournaments() {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('club_tournaments')
+        .select('*, profiles(display_name)')
+        .eq('is_active', true)
+        .order('date', { ascending: false });
+      if (data) setClubTournaments(data as any);
+    }
+    fetchTournaments();
+  }, []);
+
+  function handleClubTournamentChange(id: string) {
+    setSelectedClubTournamentId(id);
+    const ct = clubTournaments.find(t => t.id === id);
+    if (ct) {
+      setForm(prev => ({
+        ...prev,
+        tournament_name: ct.name,
+        tournament_date: ct.date,
+        buy_in: ct.buy_in.toString(),
+        guaranteed_prize: ct.guaranteed_prize?.toString() || '',
+      }));
+    }
   }
 
   // Live calculations
@@ -55,6 +86,7 @@ export default function NewListingPage() {
 
     const { data, error: err } = await supabase.from('listings').insert({
       player_id: user.id,
+      club_tournament_id: selectedClubTournamentId || null,
       tournament_name: form.tournament_name,
       tournament_date: form.tournament_date,
       venue: form.venue || null,
@@ -88,6 +120,23 @@ export default function NewListingPage() {
           <div className="card">
             <h3 style={{ marginBottom: 'var(--space-5)' }}>Dados do torneio</h3>
             <div className="flex flex-col gap-4">
+              <div className="form-group">
+                <label className="form-label" htmlFor="club-tournament">Vincular a um Torneio Oficial (Opcional)</label>
+                <select
+                  id="club-tournament"
+                  className="form-input"
+                  value={selectedClubTournamentId}
+                  onChange={(e) => handleClubTournamentChange(e.target.value)}
+                >
+                  <option value="">Não vincular (Anúncio Independente)</option>
+                  {clubTournaments.map(t => (
+                    <option key={t.id} value={t.id}>
+                      {t.profiles?.display_name} - {t.name} ({formatDate(t.date)})
+                    </option>
+                  ))}
+                </select>
+                <span className="form-hint">Vincular seu anúncio a um evento oficial de um clube verificado.</span>
+              </div>
               <div className="form-group">
                 <label className="form-label" htmlFor="tournament-name">Nome do torneio *</label>
                 <input
@@ -293,4 +342,8 @@ export default function NewListingPage() {
       </div>
     </div>
   );
+}
+
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
 }

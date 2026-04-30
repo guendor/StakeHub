@@ -1,0 +1,11 @@
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.content {
+  padding-bottom: var(--space-16);
+}

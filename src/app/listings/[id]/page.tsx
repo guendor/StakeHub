@@ -37,7 +37,7 @@ export default async function ListingDetailPage({ params }: Props) {
 
   const { data: raw } = await supabase
     .from('listings')
-    .select('*, profiles(*), interests(*, profiles(id, display_name, avatar_url, role))')
+    .select('*, profiles(*), interests(*, profiles(id, display_name, avatar_url, role)), club_tournaments(profiles(display_name))')
     .eq('id', id)
     .single();
 
@@ -65,6 +65,13 @@ export default async function ListingDetailPage({ params }: Props) {
               <div>
                 <StatusBadge status={listing.status} />
                 <h1 className={styles.title}>{listing.tournament_name}</h1>
+                {listing.club_tournaments && (
+                  <div style={{ marginBottom: '8px' }}>
+                    <span className="badge" style={{ background: 'var(--color-success-dim)', color: 'var(--color-success)', fontSize: '0.8rem' }}>
+                      ✅ Evento Oficial: {listing.club_tournaments.profiles?.display_name ?? 'Clube'}
+                    </span>
+                  </div>
+                )}
                 {listing.venue && <p className={styles.meta}>📍 {listing.venue}</p>}
                 <p className={styles.meta}>📅 {formatDate(listing.tournament_date)}</p>
               </div>

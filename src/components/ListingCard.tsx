@@ -38,6 +38,13 @@ export default function ListingCard({ listing, animate, delay = 0 }: ListingCard
           <h3 className={styles.name}>{l.tournament_name}</h3>
           <StatusBadge status={l.status} />
         </div>
+        {l.club_tournaments && (
+          <div style={{ marginBottom: '4px' }}>
+            <span className="badge" style={{ background: 'var(--color-success-dim)', color: 'var(--color-success)', fontSize: '0.75rem' }}>
+              ✅ Evento Oficial: {l.club_tournaments.profiles?.display_name ?? 'Clube'}
+            </span>
+          </div>
+        )}
         {l.venue && (
           <p className={styles.venue}>📍 {l.venue}</p>
         )}

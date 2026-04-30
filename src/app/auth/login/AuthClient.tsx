@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import styles from './AuthClient.module.css';
 
 type Tab = 'login' | 'signup';
-type Role = 'player' | 'backer';
+type Role = 'player' | 'backer' | 'club';
 
 export default function AuthClient() {
   const router = useRouter();
@@ -143,6 +143,16 @@ export default function AuthClient() {
                 <span className={styles.roleIcon}>💼</span>
                 <span className={styles.roleLabel}>Sou Investidor</span>
                 <span className={styles.roleDesc}>Quero comprar cotas</span>
+              </button>
+              <button
+                type="button"
+                className={`${styles.roleBtn} ${role === 'club' ? styles.roleBtnActive : ''}`}
+                onClick={() => setRole('club')}
+                id="auth-role-club"
+              >
+                <span className={styles.roleIcon}>🏛️</span>
+                <span className={styles.roleLabel}>Sou um Clube</span>
+                <span className={styles.roleDesc}>Organizo torneios</span>
               </button>
             </div>
             <div className="form-group">

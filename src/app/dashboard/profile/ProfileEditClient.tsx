@@ -224,6 +224,13 @@ export default function ProfileEditClient({
           <Link href="/dashboard">Dashboard</Link> / Editar perfil
         </p>
         <h1>Editar perfil</h1>
+        {initialProfile.role === 'club' && (
+          <div style={{ marginTop: 'var(--space-2)' }}>
+            <span className={`badge ${initialProfile.is_verified ? 'badge-player' : 'badge-backer'}`} style={{ background: initialProfile.is_verified ? 'var(--color-success-dim)' : 'var(--color-surface-2)', color: initialProfile.is_verified ? 'var(--color-success)' : 'var(--text-muted)' }}>
+              {initialProfile.is_verified ? '✅ Clube Verificado' : '⏳ Aguardando Verificação'}
+            </span>
+          </div>
+        )}
       </div>
 
       <div style={{ paddingBottom: 'var(--space-16)' }}>
